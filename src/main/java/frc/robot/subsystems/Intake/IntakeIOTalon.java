@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.Constants.IntakeConstants;
 
 
-public class IntakeIOHardware implements IntakeIO {
+public class IntakeIOTalon implements IntakeIO {
     
     private final TalonFX intakeMotor;
 
@@ -19,7 +19,7 @@ public class IntakeIOHardware implements IntakeIO {
 
     private final VoltageOut voltageOut;
 
-    public IntakeIOHardware() {
+    public IntakeIOTalon() {
 
         this.intakeMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR_ID);
         this.intakeVelocity = this.intakeMotor.getVelocity();

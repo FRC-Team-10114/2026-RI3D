@@ -14,6 +14,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
         this.io = io;
         this.velocity = 0.0;
+
+        this.io.configure();
     }
 
     @Override
