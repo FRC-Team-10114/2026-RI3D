@@ -22,7 +22,10 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drivetrain.TunerConstants;
-import frc.robot.subsystems.Vision.Limelight;
+import frc.robot.subsystems.Intake.IntakeIO;
+import frc.robot.subsystems.Intake.IntakeIOSpark;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+// import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
     private double MaxSpeed = (4 / 5.47) * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -39,12 +42,16 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
-
+    
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    public final Limelight limelight = new Limelight(drivetrain);
+    public final IntakeIO intakeIO = new IntakeIOSpark();
+
+    public final IntakeSubsystem intake = new IntakeSubsystem(intakeIO);
+
+    // public final Limelight limelight = new Limelight(drivetrain);
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
