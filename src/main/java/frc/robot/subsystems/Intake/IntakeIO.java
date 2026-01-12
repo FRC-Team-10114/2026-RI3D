@@ -2,8 +2,9 @@ package frc.robot.subsystems.Intake;
 
 public interface IntakeIO {
 
-    public void setControl(double position);
+    public void setControl(double velocity, boolean isFOC);
 
-    public double getPosition();
+    public double getVelocity();
     
+    public void configure();
 }
