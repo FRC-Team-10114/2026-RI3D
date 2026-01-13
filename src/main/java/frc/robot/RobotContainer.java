@@ -31,13 +31,14 @@ import frc.robot.subsystems.Intake.IntakeIO;
 import frc.robot.subsystems.Intake.IntakeIOSpark;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 // import frc.robot.subsystems.Vision.Limelight;
+import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
-    private double MaxSpeed = (4 / 5.47) * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts
-                                                                                               // desired top speed
-    private double MaxTeleOpSpeed = MaxSpeed / 2;
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
-                                                                                      // max angular velocity
+
+    private double MaxSpeed = (4 / 5.47) * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxTeleOpSpeed = MaxSpeed;
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -58,9 +59,9 @@ public class RobotContainer {
 
     public final IntakeSubsystem intake = new IntakeSubsystem(intakeIO);
 
-    private final Field2d field;
+    public final Limelight limelight = new Limelight(drivetrain);
 
-    // public final Limelight limelight = new Limelight(drivetrain);
+   private final Field2d field;
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -69,7 +70,7 @@ public class RobotContainer {
     private final SendableChooser<Command> taskChooser = new SendableChooser<>();
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("Tests");
+        autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         field = new Field2d();
