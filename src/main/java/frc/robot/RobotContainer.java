@@ -71,6 +71,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         field = new Field2d();
