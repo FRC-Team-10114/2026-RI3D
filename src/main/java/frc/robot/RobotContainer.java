@@ -70,7 +70,7 @@ public class RobotContainer {
     private final SendableChooser<Command> taskChooser = new SendableChooser<>();
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         field = new Field2d();
