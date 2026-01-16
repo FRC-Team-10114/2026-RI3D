@@ -28,18 +28,7 @@ public class IntakeIOTalon implements IntakeIO {
     
     @Override
     public void configure() {
-        TalonFXConfiguration configs = new TalonFXConfiguration();
-
-        configs.CurrentLimits
-                .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(60)
-                .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(40.0);
-
-        configs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        configs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-
-        intakeMotor.getConfigurator().apply(configs);
+        intakeMotor.getConfigurator().apply(IntakeConfig.TalonIntakeConfig);
     }
 
     @Override

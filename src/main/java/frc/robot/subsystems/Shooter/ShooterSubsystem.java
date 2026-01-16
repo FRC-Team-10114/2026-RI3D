@@ -21,6 +21,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.hood = hood;
         this.roller = roller;
         this.turret = turret;
+        
     }
 
 
