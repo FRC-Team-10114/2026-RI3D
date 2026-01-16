@@ -29,15 +29,8 @@ public class IntakeIOSpark implements IntakeIO{
 
     @Override
     public void configure() {
-        var SparkConfig = new SparkMaxConfig();
-
-        SparkConfig
-                .idleMode(IdleMode.kBrake)
-                .inverted(false)
-                .smartCurrentLimit(40)
-                .apply(SparkConfig);
         this.intake.configure(
-            SparkConfig, 
+            IntakeConfig.MaxIntakeConfig, 
             ResetMode.kResetSafeParameters, 
             PersistMode.kPersistParameters
         );
