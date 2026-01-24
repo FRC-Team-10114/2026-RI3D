@@ -3,25 +3,22 @@ package frc.robot.subsystems.Shooter.Roller;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 // 修正 1: 改用速度控制專用的 Request
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC; 
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
-import static edu.wpi.first.units.Units.*; 
+import static edu.wpi.first.units.Units.*;
 
 public class RollerHardware implements RollerIO {
-    
+
     private final TalonFX shooter = new TalonFX(15);
-    
-    // 建立速度訊號 (RPS)
+
     private final StatusSignal<AngularVelocity> velocitySignal = shooter.getVelocity();
 
-    // 修正 2: 使用 VelocityTorqueCurrentFOC
-    // Slot 0, 不使用 FOC 以外的額外前饋 (0)
     private final VelocityTorqueCurrentFOC m_request = new VelocityTorqueCurrentFOC(0);
-    
+
     public RollerHardware() {
         this.configureMotors();
     }
@@ -34,7 +31,7 @@ public class RollerHardware implements RollerIO {
         // Supply (供應電流): 限制電池端的耗電 -> 設 40A 防止像上次那樣電壓驟降
         configs.CurrentLimits
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(80.0) 
+                .withStatorCurrentLimit(80.0)
                 .withSupplyCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(40.0);
 
@@ -45,17 +42,17 @@ public class RollerHardware implements RollerIO {
         // 修正 4: PID 參數 (Torque 模式專用)
         // 這些數值需要重新用 SysId 測量，或者手動調整
         // 這裡給的是 "經驗法則" 的預估值，比你原本的大很多
-        
-        configs.Slot0.kP = 5.0;  // 誤差 1 RPS，給 5 安培修正 (比 0.11 有力多了)
+
+        configs.Slot0.kP = 5.0; // 誤差 1 RPS，給 5 安培修正 (比 0.11 有力多了)
         configs.Slot0.kI = 0.0;
         configs.Slot0.kD = 0.0;
-        
+
         // Torque 模式下，kV 通常很小或為 0 (TalonFX 內部會處理反電動勢)
         // 這裡的 kV 只是用來對抗空氣阻力和摩擦力
-        configs.Slot0.kV = 0.05; 
-        
+        configs.Slot0.kV = 0.05;
+
         // kS (靜摩擦): 要給多少安培才推得動？
-        configs.Slot0.kS = 0.5; 
+        configs.Slot0.kS = 0.5;
 
         // 修正 5: 移除 MotionMagic 設定
         // 因為我們現在是用 Velocity 模式，不需要設定 CruiseVelocity 和 Acceleration

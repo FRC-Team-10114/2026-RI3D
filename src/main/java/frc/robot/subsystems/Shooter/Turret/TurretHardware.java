@@ -73,8 +73,8 @@ public class TurretHardware implements TurretIO {
                 m_request.withPosition(Units.radiansToRotations(angle)));
     }
 
-    public void setControl(Supplier<Angle> angleSupplier) {
-        this.setAngleRadians(angleSupplier.get().in(Radians));
+    public void setControl(Angle angle) {
+        this.setAngleRadians(angle.in(Radians));
     }
 
     public void resetAngle() {

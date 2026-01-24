@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.Angle;
 
 public interface TurretIO {
 
-    public void setControl(Supplier<Angle> angleSupplier);
+    public void setControl(Angle angle);
 
     public void resetAngle();
 }
