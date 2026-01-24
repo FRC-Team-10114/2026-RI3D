@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Shooter.Hood;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -7,6 +9,8 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.units.measure.Angle;
 
 public class HoodIONEO implements HoodIO {
 
@@ -24,8 +28,8 @@ public class HoodIONEO implements HoodIO {
         }
         
     @Override
-    public void setAngle(double rad) {
-        pidController.setSetpoint(rad, ControlType.kPosition);
+    public void setAngle(Angle angle) {
+        pidController.setSetpoint(angle.in(Radians), ControlType.kPosition);
     }
 
     @Override

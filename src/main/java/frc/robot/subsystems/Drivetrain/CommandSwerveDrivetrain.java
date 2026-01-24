@@ -369,9 +369,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Pose2d getPose2d() {
         Pose2d pose = this.getState().Pose;
 
-        return pose;    
+        return pose;
+    }
+    public Rotation2d getRotation(){
+        return this.getPigeon2().getRotation2d();
     }
 
+public ChassisSpeeds getFieldVelocity() {
+        return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());
+    }
     public ChassisSpeeds getChassisSpeeds() {
         return this.getState().Speeds;
     }
@@ -398,11 +404,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
-         Command pathfindingCommand = AutoBuilder.pathfindToPose(
+        Command pathfindingCommand = AutoBuilder.pathfindToPose(
                 targetPose,
                 constraints,
-                0.0
-        );
+                0.0);
         return Commands.sequence(pathfindingCommand);
     }
 }

@@ -15,25 +15,29 @@ public class ShooterSubsystem extends SubsystemBase {
     private final HoodIO hood;
     private final RollerIO roller;
     private final TurretIO turret;
+    private final ShooterCalculator shooterCalculator;
 
-    public ShooterSubsystem(HoodIO hood, RollerIO roller, TurretIO turret) {
+    public ShooterSubsystem(HoodIO hood, RollerIO roller, TurretIO turret,ShooterCalculator shooterCalculator) {
 
         this.hood = hood;
         this.roller = roller;
         this.turret = turret;
+        this.shooterCalculator = shooterCalculator;
         
         this.turret.resetAngle();
     }
 
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        this.shooterCalculator.predictedcoordinates();
+    }
 
-    public void setHoodAngle(double targetRad) {
+    public void setHoodAngle(Angle targetRad) {
         this.hood.setAngle(targetRad); 
     }
 
-    public void setTurretAngle(Supplier<Angle> targetRad) {
+    public void setTurretAngle( Angle targetRad) {
         this.turret.setControl(targetRad);
     }
 

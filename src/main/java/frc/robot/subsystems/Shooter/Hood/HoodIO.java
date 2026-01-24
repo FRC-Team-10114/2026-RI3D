@@ -1,11 +1,12 @@
 package frc.robot.subsystems.Shooter.Hood;
 
+import java.util.function.Supplier;
+
+import edu.wpi.first.units.measure.Angle;
 
 public interface HoodIO {
-    
-    // default 提供預設的實作方法，在實作尚未定義時使用預設，且不會報錯
 
-    public default void setAngle(double rad) {}
+    public default void setAngle(Angle angle) {}
     public default void setVoltage(double volts) {}
     public default void stop() {}
 }
