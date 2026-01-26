@@ -1,4 +1,4 @@
-package frc.robot.MathHelper;
+package frc.robot.util.MathHelper;
 
 public class EncoderWithGearRatio {
     

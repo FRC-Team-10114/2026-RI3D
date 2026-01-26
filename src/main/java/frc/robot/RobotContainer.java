@@ -29,10 +29,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drivetrain.SwerveDrivetrainTest;
 import frc.robot.subsystems.Drivetrain.TunerConstants;
-import frc.robot.subsystems.Intake.IntakeIO;
-import frc.robot.subsystems.Intake.IntakeIOSpark;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
-// import frc.robot.subsystems.Vision.Limelight;
 import frc.robot.subsystems.Vision.Limelight;
 
 public class RobotContainer {
@@ -57,10 +53,6 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
-    public final IntakeIO intakeIO = new IntakeIOSpark();
-
-    public final IntakeSubsystem intake = new IntakeSubsystem(intakeIO);
 
     public final Limelight limelight = new Limelight(drivetrain, "limelight-left");
 
