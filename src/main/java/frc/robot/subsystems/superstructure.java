@@ -10,9 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer.RoundOne;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 import frc.robot.util.FieldTagMap;
 import frc.robot.util.AllianceFlipUtil;
@@ -20,8 +18,6 @@ import frc.robot.util.AllianceFlipUtil;
 public class superstructure extends SubsystemBase {
 
     private final CommandSwerveDrivetrain drive;
-
-    private final IntakeSubsystem intake;
 
     private static final double BLUE_ZONE_LIMIT = 5.50;
 
@@ -43,8 +39,7 @@ public class superstructure extends SubsystemBase {
         BOTTOM
     }
 
-    public superstructure(IntakeSubsystem intake, CommandSwerveDrivetrain drive, ShooterSubsystem shooterSubsystem) {
-        this.intake = intake;
+    public superstructure(CommandSwerveDrivetrain drive, ShooterSubsystem shooterSubsystem) {
         this.drive = drive;
         this.shooterSubsystem = shooterSubsystem;
     }
@@ -68,18 +63,6 @@ public class superstructure extends SubsystemBase {
         } else {
             return area.CENTER;
         }
-    }
-
-    public Command intake() {
-        return Commands.runOnce(() -> this.intake.intake(), this.intake);
-    }
-
-    public Command outtake() {
-        return Commands.runOnce(() -> this.intake.outtake(), this.intake);
-    }
-
-    public Command stopIntakeMotor() {
-        return Commands.runOnce(() -> this.stopIntakeMotor(), this.intake);
     }
 
     public Pose2d ToTrenchPose() {

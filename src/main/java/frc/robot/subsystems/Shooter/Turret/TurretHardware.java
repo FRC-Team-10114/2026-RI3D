@@ -16,8 +16,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.MathHelper.EncoderWithGearRatio;
-import frc.robot.MathHelper.RobustCRTCalculator;
+import frc.robot.util.MathHelper.EncoderWithGearRatio;
+import frc.robot.util.MathHelper.RobustCRTCalculator;
 
 public class TurretHardware implements TurretIO {
     private final TalonFX Turretd = new TalonFX(20);
