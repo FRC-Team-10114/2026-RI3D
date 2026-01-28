@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -15,6 +16,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import pabeles.concurrency.ConcurrencyOps.NewInstance;
 
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
@@ -102,5 +104,7 @@ public class Robot extends LoggedRobot {
     public void testExit() {}
 
     @Override
-    public void simulationPeriodic() {}
+    public void simulationPeriodic() {
+        Logger.recordOutput("Simulation/GamePiece", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+    }
 }
