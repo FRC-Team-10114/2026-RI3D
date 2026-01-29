@@ -16,8 +16,8 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 
 import frc.robot.subsystems.Shooter.ShooterCalculator;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
-import frc.robot.util.FieldTagMap;
-import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.FIeldHelper.AllianceFlipUtil;
+import frc.robot.util.FIeldHelper.FieldTagMap;
 import frc.robot.subsystems.RobotStatus;
 
 public class superstructure extends SubsystemBase {
