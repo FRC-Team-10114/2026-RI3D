@@ -6,14 +6,12 @@
 
 package frc.robot.subsystems.Shooter;
 
-import frc.robot.util.AllianceFlipUtil;
-
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 
 import org.littletonrobotics.junction.Logger;
 
-import frc.robot.Constants.siteConstants;
+import frc.robot.Constants.FieldConstants.siteConstants;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -35,6 +33,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.subsystems.RobotStatus;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
+import frc.robot.util.FIeldHelper.AllianceFlipUtil;
 
 public class ShooterCalculator {
         private final RobotStatus robotStatus;

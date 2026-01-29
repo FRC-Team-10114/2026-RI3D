@@ -4,7 +4,7 @@
  * * Licensed under the MIT License.
  */
 
-package frc.robot.util;
+package frc.robot.util.FIeldHelper;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,13 +12,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 
 public class AllianceFlipUtil {
     
     public static Translation2d apply(Translation2d translation) {
         if (shouldFlip()) {
             return new Translation2d(
-                Constants.fieldLength - translation.getX(), 
+                FieldConstants.fieldLength - translation.getX(), 
                 translation.getY()
             );
         }
@@ -28,7 +29,7 @@ public class AllianceFlipUtil {
     public static Pose2d apply(Pose2d pose) {
         if (shouldFlip()) {
             return new Pose2d(
-                Constants.fieldLength - pose.getX(),
+                FieldConstants.fieldLength - pose.getX(),
                 pose.getY(),
                 new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()) // 角度也要翻轉 (180 - theta)
             );

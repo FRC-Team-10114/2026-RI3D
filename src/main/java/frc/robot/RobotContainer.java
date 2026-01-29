@@ -171,9 +171,9 @@ public class RobotContainer {
         // Reset the field-centric heading on left bumper press.
         // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        // drivetrain.registerTelemetry(logger::telemeterize);
-        // joystick.rightBumper().onTrue(drivetrain.runOnce(drivetrain::resetPosetotest));
-        // joystick.a().whileTrue(this.superstructure.DriveToTrench());
+        drivetrain.registerTelemetry(logger::telemeterize);
+        joystick.rightBumper().onTrue(drivetrain.runOnce(drivetrain::resetPosetotest));
+        joystick.a().whileTrue(this.superstructure.DriveToTrench());
 
         joystick.povUp().whileTrue(new InstantCommand(() -> shooterSubsystem.hoodUp()));
         joystick.povDown().whileTrue(new InstantCommand(() -> shooterSubsystem.hoodDown()));
