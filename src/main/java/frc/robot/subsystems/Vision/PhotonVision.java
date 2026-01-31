@@ -19,6 +19,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PhotonVisionConstants;
 import frc.robot.Constants.PhotonVisionConstants.CameraConfig;
+import frc.robot.subsystems.RobotStatus;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
 
 public class PhotonVision extends SubsystemBase {
@@ -27,12 +28,14 @@ public class PhotonVision extends SubsystemBase {
     private final CameraConfig config;
     private final PhotonPoseEstimator poseEstimator;
     private final CommandSwerveDrivetrain drivetrain;
+    private final RobotStatus robotStatus;
 
     private int m_lastTagId = -1;
 
-    public PhotonVision(CommandSwerveDrivetrain drive, CameraConfig config) {
+    public PhotonVision(CommandSwerveDrivetrain drive, CameraConfig config, RobotStatus robotStatus) {
         this.drivetrain = drive;
         this.config = config;
+        this.robotStatus = robotStatus;
 
         // 1. 初始化相機（名稱從 Constants 取得）
         this.camera = new PhotonCamera(config.cameraName());
@@ -93,13 +96,23 @@ public class PhotonVision extends SubsystemBase {
 
             // 3. 計算信任權重（標準差）
             Vector<N3> stdDevs;
-            if (numTags >= 2) {
-                // 多 Tag 極其信任
-                stdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5));
+            if (robotStatus.NeedResetPose) {
+                // 1. 發現旗標是 True！代表剛落地，需要強力校正
+                // 給予極小的標準差 (例如 1公分, 1公分, 1度)
+                stdDevs = VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(1));
+
+                // 2. 【重要】用完之後馬上把旗標降下來 (False)
+                // 這樣下一幀就會變回普通的信任度，不會一直鎖死
+                robotStatus.NeedResetPose = false;
+
             } else {
-                // 單 Tag 信任度隨距離平方衰減，且完全不信任視覺的角度（交給陀螺儀）
-                double distErr = 0.5 * Math.pow(avgDist, 2);
-                stdDevs = VecBuilder.fill(distErr, distErr, 999999);
+                // 一般情況的標準差計算 (保持你原本的邏輯)
+                if (numTags >= 2) {
+                    stdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5));
+                } else {
+                    double distErr = 0.5 * Math.pow(avgDist, 2);
+                    stdDevs = VecBuilder.fill(distErr, distErr, 999999);
+                }
             }
 
             // 4. 發送至 Drivetrain
@@ -114,42 +127,57 @@ public class PhotonVision extends SubsystemBase {
 
     /** 用於自動階段對齊或初始定位 */
     public boolean resetPoseToVision() {
+        // 1. 取得最新的一幀結果
         var result = camera.getLatestResult();
+
+        // 2. 讓 PoseEstimator 嘗試計算座標
+        // update() 會自動根據相機位置與 Tag 佈局算出 Field-Relative Pose
         var poseOpt = poseEstimator.update(result);
 
         if (poseOpt.isPresent()) {
-            Pose2d estimatedPose2d = poseOpt.get().estimatedPose.toPose2d();
             Pose3d estimatedPose3d = poseOpt.get().estimatedPose;
+            Pose2d estimatedPose2d = estimatedPose3d.toPose2d();
 
-            // 1. 基礎檢查：高度是否合理 (Z 軸)
-            if (Math.abs(estimatedPose3d.getZ()) > 0.5)
-                return false;
+            // 取得這一次計算用了幾顆 Tag
+            int numTags = poseOpt.get().targetsUsed.size();
 
-            // 2. 取得目前機器人的位置
-            Pose2d currentPose = drivetrain.getPose2d();
+            // =========================================================
+            // 安全過濾 (Safety Checks) - 寧可不重置，也不要重置錯
+            // =========================================================
 
-            // 3. 計算視覺與目前位置的差異
-            // 距離差異 (公尺)
-            double distanceDiff = currentPose.getTranslation().getDistance(estimatedPose2d.getTranslation());
-            // 角度差異 (度)
-            double rotationDiff = Math
-                    .abs(currentPose.getRotation().getDegrees() - estimatedPose2d.getRotation().getDegrees());
-
-            // 4. 設定門檻 (Thresholds)
-            // 如果差異太小 (例如距離 < 5cm 且 角度 < 2度)，就視為已經精準，不需要重設
-            double distanceTolerance = 0.05; // 5 公分
-            double rotationTolerance = 2.0; // 2 度
-
-            if (distanceDiff < distanceTolerance && rotationDiff < rotationTolerance) {
-                // 差異太小，不執行重設，回傳 true 或 false 視你的邏輯而定 (這裡回傳 false 代表沒重設)
+            // Check A: Z 軸高度檢查 (防飛天遁地)
+            // 機器人應該在地面 (Z=0)。如果算出 Z > 0.5m，代表解算錯誤 (通常是誤判天花板燈光)
+            if (Math.abs(estimatedPose3d.getZ()) > 0.5) {
                 return false;
             }
 
-            // 5. 只有差異夠大才重設座標
+            // Check B: 模糊度檢查 (防鏡像翻轉) - 僅針對單 Tag
+            // 如果只看到 1 顆 Tag，數學上容易出現 "鏡像翻轉" 的解
+            if (numTags == 1) {
+                // 取得最佳目標的模糊度 (0.0~1.0)
+                double ambiguity = result.getBestTarget().getPoseAmbiguity();
+
+                // 如果模糊度 > 0.2，代表相機不確定角度，這時候重置風險太高
+                if (ambiguity > 0.2) {
+                    return false;
+                }
+            }
+            // 註：如果 numTags >= 2，因為幾何三角定位的關係，幾乎不可能翻轉，所以不用檢查 Ambiguity
+
+            // =========================================================
+            // 3. 執行重置 (Execution)
+            // =========================================================
+
+            // 直接覆蓋里程計，視為絕對真理
             drivetrain.resetPose(estimatedPose2d);
+
+            // (選用) Log 紀錄，方便比賽時確認有沒有成功 Reset
+            // System.out.println("Vision Reset Success! Tags used: " + numTags);
+
             return true;
         }
 
+        // 沒看到 Tag 或解算失敗
         return false;
     }
 
