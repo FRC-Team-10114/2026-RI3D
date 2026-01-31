@@ -23,6 +23,8 @@ public class Robot extends LoggedRobot {
 
     private final RobotContainer m_robotContainer;
 
+    private boolean IfResetPose = false;
+
     /* log and replay timestamp and joystick data */
     private final HootAutoReplay m_timeAndJoystickReplay = new HootAutoReplay()
             .withTimestampReplay()
@@ -43,11 +45,11 @@ public class Robot extends LoggedRobot {
 
         m_robotContainer = new RobotContainer();
     }
-    
+
     @Override
     public void robotInit() {
-    Pathfinding.setPathfinder(new LocalADStarAK());
-}
+        Pathfinding.setPathfinder(new LocalADStarAK());
+    }
 
     @Override
     public void robotPeriodic() {
@@ -56,16 +58,32 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+    }
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        boolean success = m_robotContainer.getphotonVision().resetPoseToVision();
+
+        // 4. 鎖存邏輯 (Latch Logic)：
+        // 只要成功過一次 (success == true)，m_hasVisionLocalized 就變成 true 並且保持住
+        // 這樣就算比賽開始前一秒剛好有人擋住鏡頭，只要前幾秒有對準過，我們依然相信視覺的結果
+        if (success) {
+            IfResetPose = true;
+        }
+        Logger.recordOutput("Robot/VisionResetSuccess", success);
+        Logger.recordOutput("Robot/HasLocalized", IfResetPose);
+    }
 
     @Override
-    public void disabledExit() {}
+    public void disabledExit() {
+    }
 
     @Override
     public void autonomousInit() {
+        if (IfResetPose == false) {
+            m_robotContainer.getauto().startResetPose();
+        }
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
@@ -74,10 +92,12 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+    }
 
     @Override
-    public void autonomousExit() {}
+    public void autonomousExit() {
+    }
 
     @Override
     public void teleopInit() {
@@ -87,10 +107,12 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+    }
 
     @Override
-    public void teleopExit() {}
+    public void teleopExit() {
+    }
 
     @Override
     public void testInit() {
@@ -98,10 +120,12 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void testPeriodic() {}
+    public void testPeriodic() {
+    }
 
     @Override
-    public void testExit() {}
+    public void testExit() {
+    }
 
     @Override
     public void simulationPeriodic() {
