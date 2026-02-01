@@ -66,20 +66,16 @@ public class FlywheelHardware implements FlywheelIO {
     }
 
     @Override
-    public void setRPS(AngularVelocity RPM) {
-        // 單位轉換正確
-        double targetRPS = RPM.in(RotationsPerSecond);
+    public void setRPS(AngularVelocity RPS) {
+        double targetRPS = RPS.in(RotationsPerSecond);
 
-        // 使用 Velocity Request
         flywheel.setControl(m_request.withVelocity(targetRPS));
     }
 
     @Override
     public AngularVelocity getRPS() {
-        // 1. 更新訊號
         velocitySignal.refresh();
 
-        // 2. 取得 AngularVelocity 物件
         return velocitySignal.getValue();
     }
 }

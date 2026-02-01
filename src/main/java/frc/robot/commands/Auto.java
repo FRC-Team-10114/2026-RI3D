@@ -12,10 +12,12 @@ import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
 
 public class Auto {
     private final CommandSwerveDrivetrain drive;
-    public Auto(CommandSwerveDrivetrain drive){
+
+    public Auto(CommandSwerveDrivetrain drive) {
         this.drive = drive;
         this.configureAutoChoosers();
     }
+
     public enum AutoStart {
         LEFT, CENTER, RIGHT, NONE
     }
@@ -249,5 +251,46 @@ public class Auto {
                 start,
                 RoundOne,
                 RoundTwo);
+    }
+
+    public void startResetPose() {
+        AutoStart selectedStart = AutoStartChooser.getSelected();
+        String pathName = null;
+
+        switch (selectedStart) {
+            case LEFT:
+                pathName = "Left_start";
+                break;
+            case CENTER:
+                pathName = "Center_start";
+                break;
+            case RIGHT:
+                pathName = "Right_start";
+                break;
+            case NONE:
+            default:
+                System.out.println("[Auto] No Start Position Selected, skipping reset.");
+                return;
+        }
+
+        // 3. 讀取路徑並重置座標
+        if (pathName != null) {
+            try {
+                // 讀取 PathPlanner 的路徑檔案
+                // 注意：如果你是用 .path 檔，請用 PathPlannerPath.fromPathFile(pathName)
+                // 如果你是用 Choreo .traj 檔，請維持你原本用的 fromChoreoTrajectory
+                PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(pathName);
+
+                // 取得該路徑的 "起點座標" (Starting Pose)
+                // orElse(new Pose2d()) 是防止讀不到時程式崩潰
+                Pose2d startPose = path.getStartingHolonomicPose().orElse(new Pose2d());
+
+                // 強制重置 Drive 的里程計
+                drive.resetPose(startPose);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

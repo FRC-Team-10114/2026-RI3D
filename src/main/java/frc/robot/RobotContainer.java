@@ -48,6 +48,7 @@ import frc.robot.subsystems.Shooter.Hood.HoodIONEO;
 import frc.robot.subsystems.Shooter.Turret.TurretHardware;
 import frc.robot.subsystems.Shooter.Turret.TurretIO;
 import frc.robot.subsystems.Vision.Limelight;
+import frc.robot.subsystems.Vision.PhotonVision;
 import frc.robot.subsystems.RobotStatus;
 
 public class RobotContainer {
@@ -73,7 +74,11 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    public final Limelight limelight = new Limelight(drivetrain, "limelight-left");
+     public final RobotStatus robotStatus = new RobotStatus(drivetrain);
+
+    public final Limelight limelight = new Limelight(drivetrain, "limelight-left", robotStatus);
+
+    public final  PhotonVision photonVision = new PhotonVision(drivetrain, null, robotStatus);
 
     private final Field2d field;
 
@@ -92,7 +97,6 @@ public class RobotContainer {
     private final RollerIO roller = new RollerIOTalon();
 
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(arm, roller);
-    public final RobotStatus robotStatus = new RobotStatus(drivetrain);
 
     private final ShooterCalculator shooterCalculator = new ShooterCalculator(drivetrain, robotStatus);
 
@@ -134,6 +138,12 @@ public class RobotContainer {
         // Warmup PathPlanner to avoid Java pauses
         // FollowPathCommand.warmupCommand().schedule(); (Deprecated)
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+    }
+    public PhotonVision getphotonVision(){
+        return this.photonVision;
+    }
+    public Auto getauto(){
+        return this.auto;
     }
 
     private void configureBindings() {

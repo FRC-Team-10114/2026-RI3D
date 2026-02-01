@@ -61,6 +61,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
+    private boolean m_isClimbing = false;
+
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
      * for the drive motors.
@@ -422,8 +424,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return this.getPigeon2().getRoll().getValueAsDouble();
     }
 
-    public boolean isClimbing() {
-        double threshold = 10.0;
-        return Math.abs(getPitchDegrees()) > threshold || Math.abs(getRollDegrees()) > threshold;
+public boolean isClimbing() {
+        // 取得目前最大的傾斜角 (不管它是 Pitch 還是 Roll)
+        double currentTilt = Math.max(
+            Math.abs(this.getPigeon2().getPitch().getValueAsDouble()), 
+            Math.abs(this.getPigeon2().getRoll().getValueAsDouble())
+        );
+
+        // 設定門檻
+        double onThreshold = 10.0; // 超過 10 度 -> 判定爬坡
+        double offThreshold = 8.0; // 低於 8 度 -> 判定平地
+
+        // 遲滯邏輯 (Hysteresis)
+        if (currentTilt > onThreshold) {
+            m_isClimbing = true;
+        } else if (currentTilt < offThreshold) {
+            m_isClimbing = false;
+        }
+        // 如果在 8~10 度之間，m_isClimbing 維持不變 (Latch)
+
+        return m_isClimbing;
     }
 }

@@ -26,11 +26,8 @@ import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.subsystems.RobotStatus;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
 import frc.robot.util.FIeldHelper.AllianceFlipUtil;
@@ -38,17 +35,20 @@ import frc.robot.util.FIeldHelper.AllianceFlipUtil;
 public class ShooterCalculator {
         private final RobotStatus robotStatus;
         private final CommandSwerveDrivetrain drive;
-        private final InterpolatingTreeMap<Double, Rotation2d> hoodMap;
+        private final InterpolatingTreeMap<Double, Angle> hoodMap;
         private final InterpolatingTreeMap<Double, AngularVelocity> rollMap;
         private static final InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
-        private final double phaseDelay = 0.03;
+        private final double time_error = 0.0;
+        private final double phaseDelay = 0.03 + time_error;
         public static Transform3d robotToTurret = new Transform3d(0.2, 0.0, 0.44, Rotation3d.kZero);
 
-        private static final double HARD_MIN_RADS = Units.degreesToRadians(-210.0);
-        private static final double HARD_MAX_RADS = Units.degreesToRadians(210.0);
+        private static final double HARD_MIN_RADS = ShooterConstants.HARD_MIN_RADS;
+        private static final double HARD_MAX_RADS = ShooterConstants.HARD_MAX_RADS;
 
-        private static final double SOFT_MIN_RADS = Units.degreesToRadians(-190.0);
-        private static final double SOFT_MAX_RADS = Units.degreesToRadians(190.0);
+        private static final double SOFT_MIN_RADS = ShooterConstants.SOFT_MIN_RADS;
+        private static final double SOFT_MAX_RADS = ShooterConstants.SOFT_MAX_RADS;
+
+        private static final Angle Hood_MAX_RADS = Radians.of(ShooterConstants.Hood_MAX_RADS);
 
         private double lastSetpointRads = 0.0;
 
@@ -64,7 +64,17 @@ public class ShooterCalculator {
 
                 hoodMap = new InterpolatingTreeMap<>(
                                 InverseInterpolator.forDouble(),
-                                Rotation2d::interpolate);
+                                (start, end, t) -> {
+                                        // 1. 把單位轉成 double (用 Radians 或 Degrees 都可以，統一就好)
+                                        double startVal = start.in(Radians);
+                                        double endVal = end.in(Radians);
+
+                                        // 2. 算數學插值 (start + (end - start) * t)
+                                        double result = MathUtil.interpolate(startVal, endVal, t);
+
+                                        // 3. 把 double 包回 Angle 物件
+                                        return Radians.of(result);
+                                });
                 rollMap = new InterpolatingTreeMap<>(
                                 InverseInterpolator.forDouble(),
                                 (start, end, t) -> {
@@ -74,9 +84,9 @@ public class ShooterCalculator {
                                         double interpolated = MathUtil.interpolate(startVal, endVal, t);
                                         return RotationsPerSecond.of(interpolated);
                                 });
-                hoodMap.put(2.0, Rotation2d.fromDegrees(15.0));
+                hoodMap.put(2.0, Radians.of(15.0));
 
-                rollMap.put(2.0, RotationsPerSecond.of(3000));
+                rollMap.put(2.0, RotationsPerSecond.of(10));
 
                 timeOfFlightMap.put(5.68, 1.16);
                 timeOfFlightMap.put(4.55, 1.12);
@@ -87,7 +97,8 @@ public class ShooterCalculator {
 
         public record ShootingState(
                         Rotation2d turretFieldAngle, // 砲塔該瞄準的「場地角度」
-                        double effectiveDistance // 用來查表的「有效距離」
+                        Angle HoopAngle, // 用來查表的「有效距離
+                        AngularVelocity FlywheelRPS
         ) {
         }
 
@@ -147,10 +158,10 @@ public class ShooterCalculator {
                 Logger.recordOutput("ToHubsimturretPosition",
                                 new Pose2d(simturretPosition.getX(), simturretPosition.getY(), targetFieldAngle));
 
-                return new ShootingState(targetFieldAngle, lookaheadTurretToTargetDistance);
+                return new ShootingState(targetFieldAngle, hoodMap.get(lookaheadTurretToTargetDistance),rollMap.get(lookaheadTurretToTargetDistance));
         }
 
-        //-------------------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------------------
         public Angle TurretCalculate(Rotation2d robotHeading, Angle targetRad, ShootState state) {
 
                 // 1. 根據狀態決定目前的 "合法範圍"
@@ -292,7 +303,7 @@ public class ShooterCalculator {
 
                 Logger.recordOutput("ToAlliancesimturretPosition",
                                 new Pose2d(simturretPosition.getX(), simturretPosition.getY(), targetFieldAngle));
-                return new ShootingState(targetFieldAngle, lookaheadTurretToTargetDistance);
+                return new ShootingState(targetFieldAngle, Hood_MAX_RADS, rollMap.get(lookaheadTurretToTargetDistance));
         }
 
 }

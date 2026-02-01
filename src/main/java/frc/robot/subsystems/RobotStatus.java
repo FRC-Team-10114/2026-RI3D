@@ -26,7 +26,12 @@ public class RobotStatus extends SubsystemBase {
         TOP,
         BOTTOM
     }
+
+// 這個公開變數就是我們的 "旗標"
     public boolean NeedResetPose = false;
+
+    // 用來記住 "上一次" 是否在爬坡 (為了偵測下降邊緣)
+    private boolean m_wasClimbing = false;
 
     public RobotStatus(CommandSwerveDrivetrain drive) {
         this.drive = drive;
@@ -52,15 +57,28 @@ public class RobotStatus extends SubsystemBase {
             return Area.CENTER;
         }
     }
-    public boolean ifNeedResetPose(){
-        this.NeedResetPose = this.drive.isClimbing();
-        return NeedResetPose;
+
+    public void updateOdometerStatus() {
+        // 1. 從 Drive 取得現在是否傾斜 (假設你在 Drive 裡已經寫好了遲滯邏輯的 isClimbing)
+        boolean isNowClimbing = this.drive.isClimbing();
+
+        // 2. 下降邊緣偵測 (Falling Edge Detection)
+        // 邏輯：上一幀還在爬 (True) + 這一幀變成平地 (False) = 剛落地！
+        if (m_wasClimbing && !isNowClimbing) {
+            
+            // 觸發：舉起旗標！
+            this.NeedResetPose = true;
+            Logger.recordOutput("RobotStatus/Event", "Landed! Requesting Vision Reset");
+        }
+
+        // 3. 更新舊狀態
+        m_wasClimbing = isNowClimbing;
     }
 
     @Override
     public void periodic() {
         this.getArea();
         this.getVerticalSide();
-        Logger.recordOutput("NeedResetPose", ifNeedResetPose());
+        this.updateOdometerStatus();
     }
 }
