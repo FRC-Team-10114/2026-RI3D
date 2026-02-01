@@ -24,7 +24,7 @@ public class HopperSubsystem {
         this.trigger.run();
     }
 
-    public void triggerStop() {
+    public void stopTrigger() {
         this.trigger.stop();
     }
 

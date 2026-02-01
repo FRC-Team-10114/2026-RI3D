@@ -1,26 +1,28 @@
 package frc.robot.subsystems.Intake.Roller;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
-import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.Intake.IntakeConstants.RollerConstants;
 
 public class RollerIOTalon implements RollerIO{
 
     private final TalonFX rollerMotor;
     private final StatusSignal<AngularVelocity> rollerVelocity;
-    private final MotionMagicVelocityVoltage rollerOutput;
+    private final VoltageOut output;
 
     public RollerIOTalon() {
-        this.rollerMotor = new TalonFX(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, "canivore");
+        this.rollerMotor = new TalonFX(RollerConstants.MOTOR_ID, "canivore");
         this.rollerVelocity = rollerMotor.getVelocity();
-        this.rollerOutput = new MotionMagicVelocityVoltage(0.0);
+        this.output = new VoltageOut(Volts.of(0));
     }
 
     @Override
@@ -38,20 +40,20 @@ public class RollerIOTalon implements RollerIO{
         var rollerConfig = new TalonFXConfiguration();
 
         rollerConfig.Feedback
-                .withSensorToMechanismRatio(IntakeConstants.INTAKE_ROLLER_VELOCITY_CONVERSION_FACOTR);
+                .withSensorToMechanismRatio(RollerConstants.VELOCITY_CONVERSION_FACOTR);
         rollerConfig.MotionMagic
-                .withMotionMagicAcceleration(IntakeConstants.INTAKE_ROLLER_MAX_ACCELERATION)
-                .withMotionMagicCruiseVelocity(IntakeConstants.INTAKE_ROLLER_CRUISE_VELOCITY);
+                .withMotionMagicAcceleration(RollerConstants.MAX_ACCELERATION)
+                .withMotionMagicCruiseVelocity(RollerConstants.CRUISE_VELOCITY);
         rollerConfig.MotorOutput
                 .withInverted(InvertedValue.Clockwise_Positive)
                 .withNeutralMode(NeutralModeValue.Brake);
         rollerConfig.CurrentLimits
-                .withStatorCurrentLimit(IntakeConstants.INTAKE_ROLLER_STATOR_CURRENT_LIMIT.baseUnitMagnitude())
-                .withSupplyCurrentLimit(IntakeConstants.INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT.baseUnitMagnitude());
+                .withStatorCurrentLimit(RollerConstants.STATOR_CURRENT_LIMIT.baseUnitMagnitude())
+                .withSupplyCurrentLimit(RollerConstants.SUPPLY_CURRENT_LIMIT.baseUnitMagnitude());
         rollerConfig.Slot0
-                .withKP(IntakeConstants.INTAKE_ROLLER_PID[0])
-                .withKI(IntakeConstants.INTAKE_ROLLER_PID[1])
-                .withKD(IntakeConstants.INTAKE_ROLLER_PID[2])
+                .withKP(RollerConstants.PID[0])
+                .withKI(RollerConstants.PID[1])
+                .withKD(RollerConstants.PID[2])
                 .withGravityType(GravityTypeValue.Elevator_Static);
 
         rollerMotor.getConfigurator().apply(rollerConfig);

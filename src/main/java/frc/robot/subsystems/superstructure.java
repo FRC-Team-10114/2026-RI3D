@@ -8,47 +8,62 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
-
+import frc.robot.subsystems.Hopper.HopperSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
-import frc.robot.subsystems.Shooter.ShooterCalculator;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
-import frc.robot.util.FieldTagMap;
 import frc.robot.util.FIeldHelper.AllianceFlipUtil;
-import frc.robot.subsystems.RobotStatus;
+import frc.robot.util.FIeldHelper.FieldTagMap;
 
 public class superstructure extends SubsystemBase {
 
     private final CommandSwerveDrivetrain drive;
 
-    private final IntakeSubsystem intakeSubsystem;
-
-    private final ShooterSubsystem shooterSubsystem;
+    private final IntakeSubsystem intake;
+    private final ShooterSubsystem shooter;
+    private final HopperSubsystem hopper;
 
     public final RobotStatus robotStatus;
 
     public superstructure(
             CommandSwerveDrivetrain drive,
-            ShooterSubsystem shooterSubsystem,
-            IntakeSubsystem intakeSubssystem, RobotStatus robotStatus) {
-
+            ShooterSubsystem shooter,
+            IntakeSubsystem intake, 
+            HopperSubsystem hopper,
+            RobotStatus robotStatus
+    ) {
         this.drive = drive;
-        this.shooterSubsystem = shooterSubsystem;
-        this.intakeSubsystem = intakeSubssystem;
+        this.shooter = shooter;
+        this.intake = intake;
+        this.hopper = hopper;
         this.robotStatus = robotStatus;
-
     }
 
     // Intake Methods
 
     public Command intakeCommand() {
         return Commands.startEnd(
-            intakeSubsystem::intake, 
-            intakeSubsystem::back);
+            intake::intake, 
+            intake::back);
+    }
+
+    // Hopper Methods
+
+    public Command warmUpCommand() {
+        return Commands.runOnce(hopper::warmUp);
+    }
+
+    public Command stopWashCommand() {
+        return Commands.run(hopper::stopWashing);
+    }
+
+    public Command loadCommand() {
+        return Commands.startEnd(
+            hopper::load, 
+            hopper::stopTrigger);
     }
 
 

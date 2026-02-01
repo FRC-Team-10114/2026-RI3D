@@ -13,7 +13,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.AngularVelocity;
-import frc.robot.Constants.IntakeConstants;
+
+import frc.robot.subsystems.Intake.IntakeConstants.RollerConstants;
 
 public class RollerIOSpark implements RollerIO {
 
@@ -22,7 +23,7 @@ public class RollerIOSpark implements RollerIO {
     private final SparkClosedLoopController rollerController;
 
     public RollerIOSpark() {
-        this.rollerMotor = new SparkMax(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, MotorType.kBrushless);
+        this.rollerMotor = new SparkMax(RollerConstants.MOTOR_ID, MotorType.kBrushless);
         this.rollerEncoder = rollerMotor.getEncoder();
         this.rollerController = rollerMotor.getClosedLoopController();
     }
@@ -44,17 +45,17 @@ public class RollerIOSpark implements RollerIO {
         rollerConfig
                 .idleMode(IdleMode.kBrake)
                 .inverted(false)
-                .smartCurrentLimit((int)IntakeConstants.INTAKE_ARM_SUPPLY_CURRENT_LIMIT.baseUnitMagnitude())
+                .smartCurrentLimit((int) RollerConstants.SUPPLY_CURRENT_LIMIT.baseUnitMagnitude())
                 .apply(rollerConfig);
         rollerConfig.closedLoop
                 .pid(
-                        IntakeConstants.INTAKE_ROLLER_PID[0], 
-                        IntakeConstants.INTAKE_ROLLER_PID[1], 
-                        IntakeConstants.INTAKE_ROLLER_PID[2])
+                        RollerConstants.PID[0], 
+                        RollerConstants.PID[1], 
+                        RollerConstants.PID[2])
                 .apply(rollerConfig.closedLoop);
         rollerConfig.encoder
-                .velocityConversionFactor(IntakeConstants.INTAKE_ROLLER_VELOCITY_CONVERSION_FACOTR)
-                .positionConversionFactor(IntakeConstants.INTAKE_ARM_POSITION_CONVERSION_FACTOR)
+                .velocityConversionFactor(RollerConstants.VELOCITY_CONVERSION_FACOTR)
+                .positionConversionFactor(RollerConstants.POSITION_CONVERSION_FACTOR)
                 .apply(rollerConfig.encoder);
 
         rollerMotor.configure(
