@@ -12,13 +12,12 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.subsystems.Intake.IntakeConstants.ArmConstants;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import frc.robot.Constants.IntakeConstants;
 
 public class ArmIOSpark implements ArmIO {
 
@@ -32,11 +31,11 @@ public class ArmIOSpark implements ArmIO {
 
     public ArmIOSpark() {
 
-        this.armMotor = new SparkMax(IntakeConstants.INTAKE_ARM_MOTOR_ID, MotorType.kBrushless);
+        this.armMotor = new SparkMax(ArmConstants.MOTOR_ID, MotorType.kBrushless);
         this.armEncoder = armMotor.getEncoder();
         this.armContoller = armMotor.getClosedLoopController();
 
-        this.armAbsoluteEncoder = new CANcoder(IntakeConstants.INTAKE_ROLLER_MOTOR_ID);
+        this.armAbsoluteEncoder = new CANcoder(ArmConstants.CANCODER_ID);
 
         configure();
         resetEncoder();
@@ -66,26 +65,25 @@ public class ArmIOSpark implements ArmIO {
         armConfig
                 .idleMode(IdleMode.kBrake)
                 .inverted(false)
-                .smartCurrentLimit((int) IntakeConstants.INTAKE_ARM_SUPPLY_CURRENT_LIMIT.baseUnitMagnitude())
+                .smartCurrentLimit((int) ArmConstants.SUPPLY_CURRENT_LIMIT.baseUnitMagnitude())
                 .apply(armConfig);
         armConfig.encoder
-                .velocityConversionFactor(IntakeConstants.INTAKE_ARM_VELOCITY_CONVERSION_FACOTR)
-                .positionConversionFactor(IntakeConstants.INTAKE_ARM_POSITION_CONVERSION_FACTOR)
+                .positionConversionFactor(ArmConstants.POSITION_CONVERSION_FACTOR)
                 .apply(armConfig.encoder);
         armConfig.closedLoop
                 .pid(
-                        IntakeConstants.INTAKE_ARM_PID[0],
-                        IntakeConstants.INTAKE_ARM_PID[1],
-                        IntakeConstants.INTAKE_ARM_PID[2])
+                        ArmConstants.PID[0],
+                        ArmConstants.PID[1],
+                        ArmConstants.PID[2])
                 .apply(armConfig.closedLoop);
         armConfig.closedLoop.maxMotion
-                .cruiseVelocity(IntakeConstants.INTAKE_ARM_CRUISE_VELOCITY)
-                .maxAcceleration(IntakeConstants.INTAKE_ARM_MAX_ACCELERATION)
+                .cruiseVelocity(ArmConstants.CRUISE_VELOCITY)
+                .maxAcceleration(ArmConstants.MAX_ACCELERATION)
                 .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal)
                 .apply(armConfig.closedLoop.maxMotion);
         armConfig.softLimit
-                .forwardSoftLimit(IntakeConstants.INTAKE_ARM_FORWARD_LIMIT.baseUnitMagnitude())
-                .reverseSoftLimit(IntakeConstants.INTAKE_ARM_REVERSE_LIMIT.baseUnitMagnitude())
+                .forwardSoftLimit(ArmConstants.FORWARD_LIMIT.baseUnitMagnitude())
+                .reverseSoftLimit(ArmConstants.REVERSE_LIMIT.baseUnitMagnitude())
                 .forwardSoftLimitEnabled(true)
                 .reverseSoftLimitEnabled(true)
                 .apply(armConfig.softLimit);

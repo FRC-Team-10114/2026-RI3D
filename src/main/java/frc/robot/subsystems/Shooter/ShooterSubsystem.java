@@ -54,7 +54,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        ShootingState state = this.shootergoal();
+        ShootingState state = this.shooterTargetChoose();
 
         if (state != null) {
 
@@ -73,7 +73,7 @@ public class ShooterSubsystem extends SubsystemBase {
         Logger.recordOutput("Shooter/flywheelRPSl", this.flywheel.getRPS());
     }
 
-    public ShootingState shootergoal() {
+    public ShootingState shooterTargetChoose() {
         if (robotStatus.getArea() == RobotStatus.Area.CENTER) {
             return this.shooterCalculator.calculateShootingToAlliance();
         } else {
