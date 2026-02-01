@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.signals.GainSchedBehaviorValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -168,12 +169,15 @@ public class RobotContainer {
         // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // Reset the field-centric heading on left bumper press.
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
         drivetrain.registerTelemetry(logger::telemeterize);
         joystick.rightBumper().onTrue(drivetrain.runOnce(drivetrain::resetPosetotest));
-        joystick.a().whileTrue(this.superstructure.DriveToTrench());
+        // joystick.a().whileTrue(this.superstructure.DriveToTrench());
+
+        joystick.b().whileTrue(new InstantCommand(() -> this.intakeSubsystem.intake()))
+                    .onFalse(new InstantCommand(() -> this.intakeSubsystem.back()));
+
+        joystick.x().whileTrue(new InstantCommand(() -> this.intakeSubsystem.outtake()))
+                    .onFalse(new InstantCommand(() -> this.intakeSubsystem.back()));
 
         joystick.povUp().whileTrue(new InstantCommand(() -> shooterSubsystem.hoodUp()));
         joystick.povDown().whileTrue(new InstantCommand(() -> shooterSubsystem.hoodDown()));

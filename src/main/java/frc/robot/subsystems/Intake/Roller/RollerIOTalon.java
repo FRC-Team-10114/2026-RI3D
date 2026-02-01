@@ -18,16 +18,15 @@ public class RollerIOTalon implements RollerIO{
     private final MotionMagicVelocityVoltage rollerOutput;
 
     public RollerIOTalon() {
-        this.rollerMotor = new TalonFX(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, "rio");
+        this.rollerMotor = new TalonFX(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, "canivore");
         this.rollerVelocity = rollerMotor.getVelocity();
         this.rollerOutput = new MotionMagicVelocityVoltage(0.0);
     }
 
     @Override
     public void setVelocity(AngularVelocity velocity) {
-        this.rollerMotor.setControl(this.rollerOutput.withVelocity(velocity));
+        this.rollerMotor.set(velocity.baseUnitMagnitude());
     }
-
     @Override
     public AngularVelocity getVelocity() {
         this.rollerVelocity.refresh();

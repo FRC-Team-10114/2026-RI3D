@@ -20,8 +20,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void intake() {
-        roller.setVelocity(RotationsPerSecond.of(10));
+        roller.setVelocity(RotationsPerSecond.of(0.6));
         arm.setPosition(Radians.of(Math.PI));
+    }
+
+    public void outtake() {
+        roller.setVelocity(RotationsPerSecond.of(-0.6));
     }
 
     public void back() {

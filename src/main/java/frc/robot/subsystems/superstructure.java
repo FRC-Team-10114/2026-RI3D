@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
@@ -16,8 +17,8 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 
 import frc.robot.subsystems.Shooter.ShooterCalculator;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
+import frc.robot.util.FieldTagMap;
 import frc.robot.util.FIeldHelper.AllianceFlipUtil;
-import frc.robot.util.FIeldHelper.FieldTagMap;
 import frc.robot.subsystems.RobotStatus;
 
 public class superstructure extends SubsystemBase {
@@ -30,18 +31,28 @@ public class superstructure extends SubsystemBase {
 
     public final RobotStatus robotStatus;
 
-
     public superstructure(
             CommandSwerveDrivetrain drive,
             ShooterSubsystem shooterSubsystem,
-            IntakeSubsystem intakeSubssystem,RobotStatus robotStatus) {
+            IntakeSubsystem intakeSubssystem, RobotStatus robotStatus) {
 
         this.drive = drive;
         this.shooterSubsystem = shooterSubsystem;
         this.intakeSubsystem = intakeSubssystem;
         this.robotStatus = robotStatus;
+
     }
 
+    // Intake Methods
+
+    public Command intakeCommand() {
+        return Commands.startEnd(
+            intakeSubsystem::intake, 
+            intakeSubsystem::back);
+    }
+
+
+    // Pose Alignments Methods
 
     public Pose2d ToTrenchPose() {
         Pose2d[] selectedTrench;
