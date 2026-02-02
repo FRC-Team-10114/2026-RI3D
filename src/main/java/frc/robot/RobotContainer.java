@@ -68,7 +68,7 @@ public class RobotContainer {
     public final RobotStatus robotStatus = new RobotStatus(drivetrain);
 
     public final Limelight limelight = new Limelight(drivetrain, "limelight-left", robotStatus);
-    public final PhotonVision photonVision = new PhotonVision(drivetrain, null, robotStatus);
+    public final PhotonVision photonVision = new PhotonVision(drivetrain, Constants.PhotonVisionConstants.newCam, robotStatus);
 
     private final Field2d field = new Field2d();
 

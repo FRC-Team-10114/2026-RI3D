@@ -26,7 +26,7 @@ public class TriggerIOHardware implements TriggerIO {
 
     @Override
     public void run() {
-        this.triggerMotor.setControl(this.output.withOutput(Volt.of(10)));
+        this.triggerMotor.setControl(this.output.withOutput(Volt.of(10)).withEnableFOC(false));
     }
 
     @Override
