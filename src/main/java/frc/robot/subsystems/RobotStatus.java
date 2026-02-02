@@ -1,17 +1,21 @@
 package frc.robot.subsystems;
 
+import java.util.EventObject;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
 
 public class RobotStatus extends SubsystemBase {
+
+    public EventObject eventObject = new EventObject(getClass());
+
     private static final double BLUE_ZONE_LIMIT = 5.50;
 
-    private static final double RED_ZONE_START = 16.54 - 5.50; // 約 11.04
-
-    private static final double FIELD_WIDTH = 8.21;
-    private static final double MID_Y = FIELD_WIDTH / 2.0; // 中線 Y = 4.105
+    private static final double RED_ZONE_START = FieldConstants.fieldLength - 5.50; // 約 11.04
+    private static final double MID_Y = FieldConstants.fieldWidth / 2.0; // 中線 Y = 4.105
     public final CommandSwerveDrivetrain drive;
 
     public enum Area {
@@ -25,7 +29,7 @@ public class RobotStatus extends SubsystemBase {
         BOTTOM
     }
 
-// 這個公開變數就是我們的 "旗標"
+    // 這個公開變數就是我們的 "旗標"
     public boolean NeedResetPose = false;
 
     // 用來記住 "上一次" 是否在爬坡 (為了偵測下降邊緣)
@@ -63,7 +67,7 @@ public class RobotStatus extends SubsystemBase {
         // 2. 下降邊緣偵測 (Falling Edge Detection)
         // 邏輯：上一幀還在爬 (True) + 這一幀變成平地 (False) = 剛落地！
         if (m_wasClimbing && !isNowClimbing) {
-            
+
             // 觸發：舉起旗標！
             this.NeedResetPose = true;
             Logger.recordOutput("RobotStatus/Event", "Landed! Requesting Vision Reset");

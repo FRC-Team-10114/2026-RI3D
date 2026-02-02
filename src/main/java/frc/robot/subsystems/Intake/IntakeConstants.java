@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Intake;
 
-
-
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;

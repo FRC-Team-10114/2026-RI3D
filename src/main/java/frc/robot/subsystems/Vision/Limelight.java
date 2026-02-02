@@ -9,6 +9,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.subsystems.RobotStatus;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
@@ -22,32 +23,7 @@ public class Limelight extends SubsystemBase {
 
     private int tagId = -1;
 
-    public static final double fieldLength;
-    public static final double fieldWidth;
     public final RobotStatus robotStatus;
-
-    static {
-        AprilTagFieldLayout layout;
-        try {
-            // 自動載入當年度的預設場地 (例如 2026 場地)
-            layout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-        } catch (Exception e) {
-            // 萬一讀不到檔案 (極少發生)，給個預設值防止程式崩潰
-            // 這裡可以填入規則書上的大約數值
-            layout = null;
-            e.printStackTrace();
-        }
-
-        if (layout != null) {
-            // 從官方資料直接抓取精確數值
-            fieldLength = layout.getFieldLength();
-            fieldWidth = layout.getFieldWidth();
-        } else {
-            // Fallback (保底數值)
-            fieldLength = 16.54;
-            fieldWidth = 8.21;
-        }
-    }
 
     public Limelight(
             CommandSwerveDrivetrain drive,
@@ -89,8 +65,8 @@ public class Limelight extends SubsystemBase {
             return;
 
         // 檢查座標是否跑出場地外 (X: 0~16.54m, Y: 0~8.21m)
-        if (mt2.pose.getX() < 0 || mt2.pose.getX() > fieldLength ||
-                mt2.pose.getY() < 0 || mt2.pose.getY() > fieldWidth)
+        if (mt2.pose.getX() < 0 || mt2.pose.getX() > FieldConstants.fieldLength ||
+                mt2.pose.getY() < 0 || mt2.pose.getY() > FieldConstants.fieldWidth)
             return;
 
         // ---------------------------------------------------------
