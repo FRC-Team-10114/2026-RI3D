@@ -59,6 +59,7 @@ public class Signal extends SubsystemBase { // 類別名稱習慣大寫開頭
         return allience;
     }
 
+
     public boolean isInactive() {
         return getAllianceChar() == getInactive();
     }
@@ -70,6 +71,7 @@ public class Signal extends SubsystemBase { // 類別名稱習慣大寫開頭
     public void Targetactive(Targetactive event) {
         Targetactive.add(event);
     }
+
 
     public void publishActive() {
         for(Targetactive listener : Targetactive){
@@ -111,7 +113,7 @@ public class Signal extends SubsystemBase { // 類別名稱習慣大寫開頭
             return false;
         }
     }
-
+  
     @Override
     public void periodic() {
 
