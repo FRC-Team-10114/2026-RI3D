@@ -1,12 +1,15 @@
-package frc.robot.subsystems;
+package frc.robot.util.RobotStatus;
 
+import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.List;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
+import frc.robot.util.RobotEvent.Event.*;
 
 public class RobotStatus extends SubsystemBase {
 
@@ -17,6 +20,7 @@ public class RobotStatus extends SubsystemBase {
     private static final double RED_ZONE_START = FieldConstants.fieldLength - 5.50; // 約 11.04
     private static final double MID_Y = FieldConstants.fieldWidth / 2.0; // 中線 Y = 4.105
     public final CommandSwerveDrivetrain drive;
+    private final List<NeedResetPoseEvent> NeedResetPoseEvent = new ArrayList<>();
 
     public enum Area {
         CENTER,
@@ -60,20 +64,22 @@ public class RobotStatus extends SubsystemBase {
         }
     }
 
+    public void TiggerNeedResetPoseEvent(NeedResetPoseEvent event) {
+        NeedResetPoseEvent.add(event);
+    }
+
     public void updateOdometerStatus() {
-        // 1. 從 Drive 取得現在是否傾斜 (假設你在 Drive 裡已經寫好了遲滯邏輯的 isClimbing)
         boolean isNowClimbing = this.drive.isClimbing();
 
-        // 2. 下降邊緣偵測 (Falling Edge Detection)
-        // 邏輯：上一幀還在爬 (True) + 這一幀變成平地 (False) = 剛落地！
+        // 下降邊緣偵測 (剛落地)
         if (m_wasClimbing && !isNowClimbing) {
 
-            // 觸發：舉起旗標！
-            this.NeedResetPose = true;
-            Logger.recordOutput("RobotStatus/Event", "Landed! Requesting Vision Reset");
+            // 2. [核心修改] 觸發事件：通知清單裡的所有人
+            for (NeedResetPoseEvent listener : NeedResetPoseEvent) {
+                listener.NeedResetPose();
+            }
         }
 
-        // 3. 更新舊狀態
         m_wasClimbing = isNowClimbing;
     }
 
