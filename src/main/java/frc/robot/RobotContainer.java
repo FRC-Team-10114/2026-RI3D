@@ -182,6 +182,8 @@ public class RobotContainer {
     }
 
     private void configureEvents() {
-        robotStatus.TiggerNeedResetPoseEvent(photonVision::NeedResetPoseEvent);
+        robotStatus.TriggerNeedResetPoseEvent(photonVision::NeedResetPoseEvent);
+        robotStatus.TriggerInActive();
+        robotStatus.TriggerActive();
     }
 }
