@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Shooter.ShooterCalculator.ShootingState;
-import frc.robot.subsystems.Shooter.ShooterCalculator.ShootState;
 import frc.robot.subsystems.Drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Shooter.Flywheel.FlywheelIO;
 import frc.robot.subsystems.Shooter.Hood.HoodIO;
+import frc.robot.subsystems.Shooter.Turret.TurretHardware.ShootState;
 import frc.robot.subsystems.Shooter.Turret.TurretIO;
 import frc.robot.util.RobotStatus.RobotStatus;
 
@@ -33,15 +33,19 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private ShootState currentShootState = ShootState.TRACKING;
 
-    private Angle currentTurretTargetAngle = Degree.of(0);
-
     private final RobotStatus robotStatus;
 
     private double flywheelRPS = 0.0;
 
-    private boolean IsInAllience = true;
-
     private boolean Targetactive = true;
+
+    private boolean Isshooting = false;
+
+    private boolean test = false;
+
+    private Angle m_targetAngle = Degrees.of(50);
+
+
 
     public ShooterSubsystem(HoodIO hood, FlywheelIO flywheel, TurretIO turret, ShooterCalculator shooterCalculator,
             CommandSwerveDrivetrain drive, RobotStatus robotStatus) {
@@ -53,31 +57,38 @@ public class ShooterSubsystem extends SubsystemBase {
         this.robotStatus = robotStatus;
 
         this.turret.resetAngle();
-        this.hood.reset();
+
     }
 
     @Override
     public void periodic() {
-        hood.setAngle(Radians.of(hoodPosition));
+        // SetShooterGoal();
+        Logger.recordOutput("HoodgoalAngle", m_targetAngle);
+        Logger.recordOutput("flywheelRPS", flywheelRPS);
+        Logger.recordOutput("HoodAngle", this.hood.getAngle());
+        hood.setAngle(m_targetAngle);
     }
-    public void setIsInAllience(){
-        if(robotStatus.isInMyAllianceZone()){
-            IsInAllience = true;
-        }else{
-            IsInAllience = false;
-        }
+
+    public void TrueIsshooting() {
+        Isshooting = true;
     }
-    public void TrueTargetactive(){
+
+    public void FalseIsshooting() {
+        Isshooting = false;
+    }
+
+    public void TrueTargetactive() {
         Targetactive = true;
     }
-    public void FalseTargetactive(){
+
+    public void FalseTargetactive() {
         Targetactive = false;
     }
 
-    public boolean SpinAllTime(){
-        if(Targetactive == true && IsInAllience == true){
+    public boolean SpinAllTime() {
+        if (Targetactive == true && robotStatus.isInMyAllianceZone() == true) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -88,7 +99,7 @@ public class ShooterSubsystem extends SubsystemBase {
         } else {
             return this.shooterCalculator.calculateShootingToHub();
         }
-    } 
+    }
 
     public void SetShooterGoal() {
         ShootingState state = this.shooterTargetChoose();
@@ -105,7 +116,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         this.setRollerRPS(FlywheelRPS);
 
-        this.setTurretAngle(drive.getRotation(),TurretTarget);
+        this.setTurretAngle(drive.getRotation(), TurretTarget);
     }
 
     public void setHoodAngle(Angle targetRad) {
@@ -113,35 +124,38 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setRollerRPS(AngularVelocity velocity) {
-        this.flywheel.setRPS(velocity);
+        if (SpinAllTime() || Isshooting) {
+            test = true;
+            this.flywheel.setRPS(velocity);
+        } else {
+            test = false;
+        }
     }
 
     public void setTurretAngle(Rotation2d robotAngle, Angle targetRad) {
-
-        Angle setpoint = this.shooterCalculator.TurretCalculate(robotAngle, targetRad, currentShootState);
-
-        this.turret.setControl(setpoint);
+        
+        this.turret.setAngle(robotAngle, targetRad, currentShootState);
 
     }
 
     // TEST METHOD
 
     public void hoodUp() {
-        this.hoodPosition = Radians.convertFrom(58, Degrees);
+        m_targetAngle = m_targetAngle.plus(Degrees.of(5));
     }
 
     public void hoodDown() {
-        this.hoodPosition = Radians.convertFrom(38, Degrees);
+        m_targetAngle = m_targetAngle.minus(Degrees.of(5));
     }
 
     public void flywheelup() {
-        this.flywheelRPS += 50;
-        this.setRollerRPS(RotationsPerSecond.of(flywheelRPS));
+        this.flywheelRPS += 10;
+        this.flywheel.setRPS(RotationsPerSecond.of(flywheelRPS));
     }
 
     public void flywheeldown() {
-        this.flywheelRPS -= 50;
-        this.setRollerRPS(RotationsPerSecond.of(flywheelRPS));
+        this.flywheelRPS -= 10;
+        this.flywheel.setRPS(RotationsPerSecond.of(flywheelRPS));
     }
 
     public void setShootingState(boolean shooting) {
