@@ -21,7 +21,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void intake() {
-        roller.setVoltage(Volts.of(8));
+        roller.setVoltage(Volts.of(10));
         arm.setPosition(Radians.of(Math.PI));
     }
 

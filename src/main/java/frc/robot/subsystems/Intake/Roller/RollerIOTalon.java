@@ -24,11 +24,12 @@ public class RollerIOTalon implements RollerIO{
         this.rollerMotor = new TalonFX(RollerConstants.MOTOR_ID, "canivore");
         this.rollerVelocity = rollerMotor.getVelocity();
         this.output = new VoltageOut(Volts.of(0));
+        configure();
     }
 
     @Override
     public void setVoltage(Voltage voltage) {
-        this.rollerMotor.setControl(output.withOutput(Volts.of(10)));
+        this.rollerMotor.setControl(output.withOutput(voltage));
     }
     @Override
     public AngularVelocity getVelocity() {
@@ -47,7 +48,7 @@ public class RollerIOTalon implements RollerIO{
                 .withMotionMagicCruiseVelocity(RollerConstants.CRUISE_VELOCITY);
         rollerConfig.MotorOutput
                 .withInverted(InvertedValue.Clockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Brake);
+                .withNeutralMode(NeutralModeValue.Coast);
         rollerConfig.CurrentLimits
                 .withStatorCurrentLimit(RollerConstants.STATOR_CURRENT_LIMIT.baseUnitMagnitude())
                 .withSupplyCurrentLimit(RollerConstants.SUPPLY_CURRENT_LIMIT.baseUnitMagnitude());

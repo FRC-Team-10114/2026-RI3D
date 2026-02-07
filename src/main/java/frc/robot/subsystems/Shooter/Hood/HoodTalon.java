@@ -57,7 +57,7 @@ public class HoodTalon implements HoodIO {
 
         double targetSensorRotations = Units.degreesToRotations(25.0) * sensorToMechRatio;
 
-        cfg.MagnetSensor.MagnetOffset = 0.397705078125 + targetSensorRotations;
+        cfg.MagnetSensor.MagnetOffset = 0.447998046875 + targetSensorRotations;
 
         cfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
         cfg.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
