@@ -43,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private boolean test = false;
 
-    private Angle m_targetAngle = Degrees.of(50);
+    private Angle m_targetAngle = Degrees.of(25);
 
 
 
