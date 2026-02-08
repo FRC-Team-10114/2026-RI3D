@@ -47,6 +47,8 @@ public class TurretIONEO extends TurretIO {
                 this.slaveCANcoder = new CANcoder(22);
 
                 configureMotors();
+                resetAngle();
+                this.lastSetpointRads = getAngle().in(Radians);
         }
 
         @Override

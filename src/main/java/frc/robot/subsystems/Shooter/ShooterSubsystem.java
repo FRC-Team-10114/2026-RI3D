@@ -61,8 +61,6 @@ public class ShooterSubsystem extends SubsystemBase {
         this.shooterCalculator = shooterCalculator;
         this.drive = drive;
         this.robotStatus = robotStatus;
-
-        this.turret.resetAngle();
     }
 
     public static ShooterSubsystem create(CommandSwerveDrivetrain drive, RobotStatus status) {
