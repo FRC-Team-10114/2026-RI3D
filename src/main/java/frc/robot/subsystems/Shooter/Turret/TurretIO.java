@@ -21,6 +21,8 @@ public abstract class TurretIO {
 
     public abstract void resetAngle();
 
+    public abstract Angle getAngle();
+
     public Angle Calculate(Rotation2d robotHeading, Angle targetRad, ShootState state) {
 
         // 1. 根據狀態決定目前的 "合法範圍"
